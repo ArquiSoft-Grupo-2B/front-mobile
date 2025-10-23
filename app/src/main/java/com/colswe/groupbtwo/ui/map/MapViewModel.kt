@@ -1,11 +1,13 @@
 package com.colswe.groupbtwo.ui.map
 
+import android.content.Context
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.colswe.groupbtwo.data.repository.AuthRepository
 import com.colswe.groupbtwo.data.repository.RoutesRepository
 import com.colswe.groupbtwo.data.model.Route
+import com.colswe.groupbtwo.util.NetworkUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +18,9 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class MapViewModel(
+    private val context: Context,
     private val authRepository: AuthRepository = AuthRepository(),
-    private val routesRepository: RoutesRepository = RoutesRepository()
+    private val routesRepository: RoutesRepository = RoutesRepository(context)
 ) : ViewModel() {
 
     private val _nearbyRoutes = MutableStateFlow<List<Route>>(emptyList())
@@ -50,6 +53,9 @@ class MapViewModel(
     private val _validationMessage = MutableStateFlow<String?>(null)
     val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
 
+    private val _isOfflineMode = MutableStateFlow(false)
+    val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
+
     fun logout() {
         authRepository.logout()
     }
@@ -65,25 +71,37 @@ class MapViewModel(
     fun refreshRoutes() {
         val lat = _currentLocation.value?.latitude
         val lng = _currentLocation.value?.longitude
-        loadNearbyRoutes(lat, lng)
+        loadNearbyRoutes(lat, lng, forceRefresh = true)
     }
 
-    fun loadNearbyRoutes(lat: Double? = null, lng: Double? = null) {
+    fun loadNearbyRoutes(lat: Double? = null, lng: Double? = null, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _isLoadingRoutes.value = true
             _errorMessage.value = null
 
+            val hasInternet = NetworkUtil.isNetworkAvailable(context)
+            _isOfflineMode.value = !hasInternet
+
             val latitude = lat ?: _currentLocation.value?.latitude ?: 4.63
             val longitude = lng ?: _currentLocation.value?.longitude ?: -74.08034
 
-            routesRepository.getNearbyRoutes(latitude, longitude).fold(
+            routesRepository.getNearbyRoutes(latitude, longitude, forceRefresh).fold(
                 onSuccess = { routes ->
                     _nearbyRoutes.value = routes
                     applyFilters()
                     _isLoadingRoutes.value = false
+
+                    if (!hasInternet && routes.isNotEmpty()) {
+                        _errorMessage.value = "Modo offline: Mostrando rutas guardadas"
+                    }
                 },
                 onFailure = { exception ->
-                    _errorMessage.value = "Error al cargar rutas: ${exception.message}"
+                    val errorMsg = if (!hasInternet) {
+                        "Sin conexión y sin datos guardados"
+                    } else {
+                        "Error al cargar rutas: ${exception.message}"
+                    }
+                    _errorMessage.value = errorMsg
                     _isLoadingRoutes.value = false
                 }
             )
@@ -126,6 +144,10 @@ class MapViewModel(
 
     fun clearValidationMessage() {
         _validationMessage.value = null
+    }
+
+    fun clearErrorMessage() {
+        _errorMessage.value = null
     }
 
     fun startNavigation(route: Route): Boolean {

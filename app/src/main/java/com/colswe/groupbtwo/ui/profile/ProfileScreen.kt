@@ -106,7 +106,6 @@ fun ProfileScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Avatar y email
                     Card(
                         modifier = Modifier
                             .size(100.dp),
@@ -140,7 +139,6 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Formulario de edición
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
@@ -152,7 +150,6 @@ fun ProfileScreen(
                                 .fillMaxWidth()
                                 .padding(24.dp)
                         ) {
-                            // Alias
                             Text(
                                 text = "Alias",
                                 style = MaterialTheme.typography.labelLarge,
@@ -227,7 +224,6 @@ fun ProfileScreen(
                                             )
                                         }
 
-                                        // Mostrar ayuda si el error es de Firestore
                                         if (state.error?.contains("Firestore", ignoreCase = true) == true) {
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Text(
@@ -326,7 +322,6 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Información adicional
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),

@@ -52,13 +52,15 @@ private val routeColors = listOf(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = viewModel(),
     onLogout: () -> Unit = {},
     onProfile: () -> Unit = {}
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val viewModel: MapViewModel = viewModel(
+        factory = MapViewModelFactory(context)
+    )
     val nearbyRoutes by viewModel.nearbyRoutes.collectAsState()
     val filteredRoutes by viewModel.filteredRoutes.collectAsState()
     val isLoadingRoutes by viewModel.isLoadingRoutes.collectAsState()

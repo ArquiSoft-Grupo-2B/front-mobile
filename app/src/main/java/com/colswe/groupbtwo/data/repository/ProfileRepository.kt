@@ -22,7 +22,6 @@ class ProfileRepository(
                     val profile = document.toObject(UserProfile::class.java)
                     Result.success(profile ?: UserProfile())
                 } else {
-                    // Si no existe el perfil, crear uno básico
                     val newProfile = UserProfile(
                         id = currentUser.uid,
                         email = currentUser.email ?: "",
@@ -32,8 +31,6 @@ class ProfileRepository(
                     Result.success(newProfile)
                 }
             } catch (firestoreException: Exception) {
-                // Si Firestore no está habilitado o hay error de conexión,
-                // retornar un perfil básico con los datos de Firebase Auth
                 val basicProfile = UserProfile(
                     id = currentUser.uid,
                     email = currentUser.email ?: "",
@@ -59,7 +56,6 @@ class ProfileRepository(
                 usersCollection.document(currentUser.uid).set(updatedProfile).await()
                 Result.success(Unit)
             } catch (firestoreException: Exception) {
-                // Si Firestore no está disponible, retornar error amigable
                 Result.failure(Exception("Firestore no está habilitado. Por favor, habilítalo en Firebase Console."))
             }
         } catch (e: Exception) {
