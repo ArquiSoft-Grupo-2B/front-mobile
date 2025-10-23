@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "330619026022",
+    "project_id": "arquisoft-2b",
+    "storage_bucket": "arquisoft-2b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330619026022:android:1bd4917132da23623d4ba7",
+        "android_client_info": {
+          "package_name": "com.colswe.groupbtwo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyUbcO6uonOLbW00-rljC5BrO3HIXz22U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
